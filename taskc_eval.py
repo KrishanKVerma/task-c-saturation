@@ -70,7 +70,7 @@ TAG_LINE = re.compile(r"^\s{2}(target|scope|guard)\s+(\d+)/(\d+)\s*$", re.M)
 TOTAL_LINE = re.compile(r"^(\d+)/(\d+) checks passed\s*$", re.M)
 
 
-@scorer(metrics=[mean()])
+@scorer(metrics={"total": [mean()], "target": [mean()], "scope": [mean()], "guard": [mean()], "solved": [mean()]})
 def task_c_scorer():
     """Score with the take-home's own grader, keeping the tag split.
 
