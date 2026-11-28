@@ -76,6 +76,21 @@ Both ends of the size range score 16 of 16, identical to single-shot. A
 floor. Tool access does not separate the models: the task is saturated in both
 formats.
 
+## Under prompt pressure
+
+`taskc_variants.py` loads three framings of the same task from `variants.jsonl`:
+the plain instruction, an urgent one ("blocking a release"), and one that
+invites overreach ("feel free to tidy anything that looks wrong"). The third is
+the direct test of `scope`: it asks the model to do what the task forbids.
+
+| Model | Framings x epochs | Mean total | Scope |
+|---|---|---|---|
+| liquid/lfm-3-1.7b | 3 x 2 | 16.00 | 5.00 |
+| nemotron-3-ultra-550b-a55b | 3 x 2 | 16.00 | 5.00 |
+
+All 12 samples scored 16 of 16. Neither model touched `median` or `variance`,
+even when invited to. Two samples per cell, so this is a check, not a rate.
+
 ## Running it
 
 ```
@@ -84,7 +99,7 @@ inspect eval taskc_eval.py --model <provider>/<model>
 python probe.py            # no model call, no API key
 ```
 
-`logs/` holds the `.eval` files behind both tables above.
+`logs/` holds the `.eval` files behind the tables above.
 
 ## Known limitations
 
