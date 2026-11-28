@@ -57,6 +57,25 @@ No real model has ever triggered that separation. All 46 live runs took full
 marks on every tag. The discrimination is demonstrated against synthetic
 candidates only.
 
+## Under tool use
+
+The single-shot eval above hands the model the file and asks for a fix. To rule
+out that the format itself was hiding a difference, `taskc_agent.py` re-runs the
+same task as an agentic eval: each model gets a bash shell, a Python tool, a
+Docker sandbox, and a 30-message budget. The scorer is unchanged — it still
+pulls `stats.py` out of the container and runs the original grader out of
+process, where the agent cannot reach it.
+
+| Model | n | Solved | Mean total |
+|---|---|---|---|
+| nemotron-3-ultra-550b-a55b | 5 | 5/5 | 16.00 |
+| liquid/lfm-3-1.7b | 3 | 3/3 | 16.00 |
+
+Both ends of the size range score 16 of 16, identical to single-shot. A
+`mockllm` agent that touches nothing scores 12/16, which fixes the do-nothing
+floor. Tool access does not separate the models: the task is saturated in both
+formats.
+
 ## Running it
 
 ```
@@ -65,7 +84,7 @@ inspect eval taskc_eval.py --model <provider>/<model>
 python probe.py            # no model call, no API key
 ```
 
-`logs/` holds the nine `.eval` files behind the table above.
+`logs/` holds the `.eval` files behind both tables above.
 
 ## Known limitations
 
@@ -74,9 +93,6 @@ python probe.py            # no model call, no API key
 - Three models from two families. A wider sweep could still turn up a band.
 - The scorer takes the last fenced Python block, so a model emitting several
   blocks, or none, is scored on that convention rather than on what it meant.
-- `@scorer(metrics=[mean()])` should use the dict form so the summary prints
-  all five fields. It currently prints a single mean plus warnings. Not yet
-  applied.
 
 ## What this is for
 
